@@ -1,12 +1,7 @@
 package com.example.myapplication;
 
 public class QuizModal {
-    private  String question;
-    private String question1;
-    private String question2;
-    private String question3;
-    private String question4;
-    private String answer;
+    private String question, question1, question2, question3, question4, answer;
 
     public QuizModal(String question, String question1, String question2, String question3, String question4, String answer) {
         this.question = question;

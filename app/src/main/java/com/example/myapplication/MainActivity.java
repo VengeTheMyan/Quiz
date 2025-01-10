@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     Random random;
-        int currentScore = 0, questionAttempted = 1, currentPos;
+        int currentScore = 0, questionAttempted = 0, currentPos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,12 +132,20 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 // Handle timer expiration: move to the next question
                 questionAttempted++;
+                if (quizModalArrayList.isEmpty() || questionAttempted > 10) {
+                    // Stop the timer and show final score
+                    countDownTimer.cancel();
+                    showBottomSheet(); // Display the score
+                    return; // Prevent further operations
+                }
+                // Remove the current question to avoid repetition
+                quizModalArrayList.remove(currentPos);
+
+                // Set data for the next question
                 if (!quizModalArrayList.isEmpty()) {
                     currentPos = random.nextInt(quizModalArrayList.size());
-                    setDataToViews(currentPos);
-                    startTimer(); // Restart timer for the next question
-                } else {
-                    showBottomSheet(); // Show score if no more questions
+                    setDataToViews(currentPos); // Update the UI
+                    startTimer(); // Restart the timer for the next question
                 }
             }
         }.start();
@@ -154,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 currentPos = random.nextInt(quizModalArrayList.size());
-                questionAttempted = 1;
+                questionAttempted = 0;
                 currentScore = 0;
                 setDataToViews(currentPos);
                 bottomSheetDialog.dismiss();
@@ -163,10 +171,12 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetDialog.setCancelable(false);
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+        countDownTimer.cancel();
+
     }
     private void setDataToViews(int currentPos){
         questionNumberTV.setText("Questions Attempted: "+questionAttempted + "/10");
-        if(questionAttempted == 10){
+        if(questionAttempted >= 10){
             countDownTimer.cancel();
             showBottomSheet();
         }
