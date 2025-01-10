@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView questionTV, questionNumberTV;
     private Button option1Btn, option2Btn, option3Btn, option4Btn;
     private ArrayList<QuizModal> quizModalArrayList;
+
+    private CountDownTimer countDownTimer;
+    private TextView timerTV;
+
+
     Random random;
         int currentScore = 0, questionAttempted = 1, currentPos;
     @Override
@@ -32,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         questionTV = findViewById(R.id.idTVQuestion);
         questionNumberTV = findViewById(R.id.idTVQuestionAttempted);
+        timerTV = findViewById(R.id.idTVTimer);
         option1Btn = findViewById(R.id.idBtnOption1);
         option2Btn = findViewById(R.id.idBtnOption2);
         option3Btn = findViewById(R.id.idBtnOption3);
@@ -44,48 +51,98 @@ public class MainActivity extends AppCompatActivity {
         option1Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option1Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
+                countDownTimer.cancel();
+                if (quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase()
+                        .equals(option1Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
                     currentScore++;
                 }
                 questionAttempted++;
-                currentPos = random.nextInt(quizModalArrayList.size());
-                setDataToViews(currentPos);
+                if (!quizModalArrayList.isEmpty()) {
+                    currentPos = random.nextInt(quizModalArrayList.size());
+                    setDataToViews(currentPos);
+                } else {
+                    showBottomSheet();
                 }
+            }
         });
+
         option2Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option2Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
+                countDownTimer.cancel();
+                if (quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase()
+                        .equals(option2Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
                     currentScore++;
                 }
                 questionAttempted++;
-                currentPos = random.nextInt(quizModalArrayList.size());
-                setDataToViews(currentPos);
+                if (!quizModalArrayList.isEmpty()) {
+                    currentPos = random.nextInt(quizModalArrayList.size());
+                    setDataToViews(currentPos);
+                } else {
+                    showBottomSheet();
+                }
             }
         });
+
         option3Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option3Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
+                countDownTimer.cancel();
+                if (quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase()
+                        .equals(option3Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
                     currentScore++;
                 }
                 questionAttempted++;
-                currentPos = random.nextInt(quizModalArrayList.size());
-                setDataToViews(currentPos);
+                if (!quizModalArrayList.isEmpty()) {
+                    currentPos = random.nextInt(quizModalArrayList.size());
+                    setDataToViews(currentPos);
+                } else {
+                    showBottomSheet();
+                }
             }
         });
+
         option4Btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option4Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
+                countDownTimer.cancel();
+                if (quizModalArrayList.get(currentPos).getAnswer().trim().toLowerCase()
+                        .equals(option4Btn.getText().toString().trim().toLowerCase(Locale.ROOT))) {
                     currentScore++;
                 }
                 questionAttempted++;
-                currentPos = random.nextInt(quizModalArrayList.size());
-                setDataToViews(currentPos);
+                if (!quizModalArrayList.isEmpty()) {
+                    currentPos = random.nextInt(quizModalArrayList.size());
+                    setDataToViews(currentPos);
+                } else {
+                    showBottomSheet();
+                }
             }
         });
+
     }
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(21000, 1000) { // 15 seconds
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timerTV.setText("Time Left: " + millisUntilFinished / 1000 + "s"); // Update timer
+            }
+
+            @Override
+            public void onFinish() {
+                // Handle timer expiration: move to the next question
+                questionAttempted++;
+                if (!quizModalArrayList.isEmpty()) {
+                    currentPos = random.nextInt(quizModalArrayList.size());
+                    setDataToViews(currentPos);
+                    startTimer(); // Restart timer for the next question
+                } else {
+                    showBottomSheet(); // Show score if no more questions
+                }
+            }
+        }.start();
+    }
+
 
     private void showBottomSheet(){
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
@@ -110,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
     private void setDataToViews(int currentPos){
         questionNumberTV.setText("Questions Attempted: "+questionAttempted + "/10");
         if(questionAttempted == 10){
+            countDownTimer.cancel();
             showBottomSheet();
         }
         else{
@@ -118,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
             option2Btn.setText(quizModalArrayList.get(currentPos).getQuestion2());
             option3Btn.setText(quizModalArrayList.get(currentPos).getQuestion3());
             option4Btn.setText(quizModalArrayList.get(currentPos).getQuestion4());
+            startTimer();
         }
 
     }
